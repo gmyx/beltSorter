@@ -166,11 +166,11 @@ gui["belt-sorter-advanced"].click = function(nameArr,player,entity)
 		local box = player.gui.left.beltSorterGui.table["beltSorter.slot."..nameArr[1].."."..nameArr[2]]
 		if box.sprite == "" then
 			itemSelection_open(player,function(itemName)
-				m.beltSorterSetSlotFilter(entity,nameArr,itemName,{true,true})
+				m.beltSorterSetSlotFilter(entity,nameArr,itemName)
 				m.beltSorterRefreshGui(player,entity)
 			end)
 		else
-			m.beltSorterSetSlotFilter(entity,nameArr,nil,nil)
+			m.beltSorterSetSlotFilter(entity,nameArr,nil,true)
 			m.beltSorterRefreshGui(player,entity)
 		end
 	elseif fieldName == "priority" then
@@ -249,11 +249,15 @@ end
 -- data handling
 ---------------------------------------------------
 
-m.beltSorterSetSlotFilter = function(entity,nameArr,itemName,sides)
+m.beltSorterSetSlotFilter = function(entity,nameArr,itemName,clearSides)
 	local data = global.entityData[idOfEntity(entity)]
 	if data.guiFilter == nil then data.guiFilter = {} end
 	data.guiFilter[nameArr[1].."."..nameArr[2]] = itemName
-	data.guiFilter[nameArr[1].."."..nameArr[2]..".sides"] = sides
+	if clearSides == true then
+		data.guiFilter[nameArr[1].."."..nameArr[2]..".sides"] = {nil,nil}
+	elseif data.guiFilter[nameArr[1].."."..nameArr[2]..".sides"] == {nil,nil} or data.guiFilter[nameArr[1].."."..nameArr[2]..".sides"] == nil then
+		data.guiFilter[nameArr[1].."."..nameArr[2]..".sides"] = {true,true}
+	end
 	m.beltSorterRebuildFilterFromGui(data)
 end
 
